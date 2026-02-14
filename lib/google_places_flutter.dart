@@ -18,6 +18,8 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   bool isLatLngRequired = true;
 
   TextStyle textStyle;
+  final String?
+      locationrestriction; // circle:radius@lat,lng or rectangle:southwest@northeast
   String googleAPIKey;
   int debounceTime = 600;
   List<String>? countries = [];
@@ -52,6 +54,7 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.inputDecoration = const InputDecoration(),
       this.itemClick,
       this.isLatLngRequired = true,
+      this.locationrestriction,
       this.textStyle = const TextStyle(),
       this.countries,
       this.getPlaceDetailWithLatLng,
@@ -118,13 +121,13 @@ class _GooglePlaceAutoCompleteTextFieldState
                 style: widget.textStyle,
                 controller: widget.textEditingController,
                 focusNode: widget.focusNode ?? FocusNode(),
-                keyboardType: widget.keyboardType ?? TextInputType.streetAddress,
+                keyboardType:
+                    widget.keyboardType ?? TextInputType.streetAddress,
                 textInputAction: widget.textInputAction ?? TextInputAction.done,
                 onFieldSubmitted: (value) {
-                  if(widget.formSubmitCallback!=null){
+                  if (widget.formSubmitCallback != null) {
                     widget.formSubmitCallback!();
                   }
-
                 },
                 validator: (inputString) {
                   return widget.validator?.call(inputString, context);
@@ -175,6 +178,9 @@ class _GooglePlaceAutoCompleteTextFieldState
         widget.radius != null) {
       apiURL = apiURL +
           "&location=${widget.latitude},${widget.longitude}&radius=${widget.radius}";
+    }
+    if (widget.locationrestriction != null) {
+      apiURL = apiURL + "&locationrestriction=${widget.locationrestriction}";
     }
 
     if (_cancelToken?.isCancelled == false) {
@@ -268,7 +274,7 @@ class _GooglePlaceAutoCompleteTextFieldState
                             widget.itemClick!(selectedData);
 
                             if (widget.isLatLngRequired) {
-                             await getPlaceDetailsFromPlaceId(selectedData);
+                              await getPlaceDetailsFromPlaceId(selectedData);
                             }
                             removeOverlay();
                           }
